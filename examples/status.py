@@ -21,6 +21,7 @@ async def get_information():
 
             result = await modem.information()
             print("serial_number: {}".format(result.serial_number))
+            print("usage: {}".format(result.usage))
             print("upstream: {}".format(result.upstream))
             print("wire_connected: {}".format(result.wire_connected))
             print("mobile_connected: {}".format(result.mobile_connected))
