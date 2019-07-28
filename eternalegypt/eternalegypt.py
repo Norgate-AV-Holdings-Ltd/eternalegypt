@@ -34,6 +34,8 @@ class Information:
     sms = attr.ib(factory=list)
     usage = attr.ib(default=None)
     upstream = attr.ib(default=None)
+    wire_connected = attr.ib(default=None)
+    mobile_connected = attr.ib(default=None)
     serial_number = attr.ib(default=None)
     connection = attr.ib(default=None)
     connection_text = attr.ib(default=None)
@@ -216,31 +218,30 @@ class LB2120:
         result = Information()
 
         result.serial_number = data['general']['FSN']
-        import pprint
-        pprint.pprint(data)
-        #result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
-        #result.upstream = data['failover']['backhaul']
-        #result.wire_connected = data['failover']['wanConnected']
-        #result.mobile_connected = (data['wwan']['connection'] == 'Connected')
-        #result.connection_text = data['wwan']['connectionText']
-        #result.connection_type = data['wwan']['connectionType']
-        #result.current_nw_service_type = data['wwan']['currentNWserviceType']
-        #result.current_ps_service_type = data['wwan']['currentPSserviceType']
-        #result.register_network_display = data['wwan']['registerNetworkDisplay']
-        #result.roaming = data['wwan']['roaming']
-        #result.radio_quality = data['wwanadv']['radioQuality']
-        #result.rx_level = data['wwanadv']['rxLevel']
-        #result.tx_level = data['wwanadv']['txLevel']
-        #result.current_band = data['wwanadv']['curBand']
-        #result.cell_id = data['wwanadv']['cellId']
+        result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
+        if 'failover' in data:
+            result.upstream = data['failover']['backhaul']
+            result.wire_connected = data['failover']['wanConnected']
+        result.mobile_connected = (data['wwan']['connection'] == 'Connected')
+        result.connection_text = data['wwan']['connectionText']
+        result.connection_type = data['wwan']['connectionType']
+        result.current_nw_service_type = data['wwan']['currentNWserviceType']
+        result.current_ps_service_type = data['wwan']['currentPSserviceType']
+        result.register_network_display = data['wwan']['registerNetworkDisplay']
+        result.roaming = data['wwan']['roaming']
+        result.radio_quality = data['wwanadv']['radioQuality']
+        result.rx_level = data['wwanadv']['rxLevel']
+        result.tx_level = data['wwanadv']['txLevel']
+        result.current_band = data['wwanadv']['curBand']
+        result.cell_id = data['wwanadv']['cellId']
 
-        #for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
-        #    # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik',
-        #    #  'sender': '555-987-654', 'read': False}
-        #    dt = datetime.strptime(msg['rxTime'], '%d/%m/%y %I:%M:%S %p')
-        #    element = SMS(int(msg['id']), dt, not msg['read'], msg['sender'], msg['text'])
-        #    result.sms.append(element)
-        #result.sms.sort(key=lambda sms: sms.id)
+        for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
+            # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik',
+            #  'sender': '555-987-654', 'read': False}
+            dt = datetime.strptime(msg['rxTime'], '%d/%m/%y %I:%M:%S %p')
+            element = SMS(int(msg['id']), dt, not msg['read'], msg['sender'], msg['text'])
+            result.sms.append(element)
+        result.sms.sort(key=lambda sms: sms.id)
 
         return result
 
