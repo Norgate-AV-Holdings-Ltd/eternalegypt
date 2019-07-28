@@ -116,6 +116,9 @@ class LB2120:
 
                     match = re.search(r'name="token" value="(.*?)"', text)
                     if not match:
+                        match = re.search(r'"secToken": "(.*?)"', text)
+
+                    if not match:
                         _LOGGER.error("No token found during login")
                         raise Error()
 
